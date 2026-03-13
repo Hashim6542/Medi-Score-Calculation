@@ -38,8 +38,20 @@ public class MediScoreCalculatorTest {
     }
 
     @Test
+    void respirationRate11ShouldScore1() {
+        int score = calculator.calculateScore(0, 0, 11, 95, 37.1);
+        assertEquals(1, score);
+    }
+
+    @Test
     void respirationRate12ShouldScore0() {
         int score = calculator.calculateScore(0, 0, 12, 95, 37.1);
+        assertEquals(0, score);
+    }
+
+    @Test
+    void respirationRate20ShouldScore0() {
+        int score = calculator.calculateScore(0, 0, 20, 95, 37.1);
         assertEquals(0, score);
     }
 
@@ -50,9 +62,57 @@ public class MediScoreCalculatorTest {
     }
 
     @Test
+    void respirationRate24ShouldScore2() {
+        int score = calculator.calculateScore(0, 0, 24, 95, 37.1);
+        assertEquals(2, score);
+    }
+
+    @Test
     void respirationRate25ShouldScore3() {
         int score = calculator.calculateScore(0, 0, 25, 95, 37.1);
         assertEquals(3, score);
+    }
+
+    @Test
+    void oxygenSaturation83ShouldScore3() {
+        int score = calculator.calculateScore(0, 0, 15, 83, 37.1);
+        assertEquals(3, score);
+    }
+
+    @Test
+    void oxygenSaturation84ShouldScore2() {
+        int score = calculator.calculateScore(0, 0, 15, 84, 37.1);
+        assertEquals(2, score);
+    }
+
+    @Test
+    void oxygenSaturation85ShouldScore2() {
+        int score = calculator.calculateScore(0, 0, 15, 85, 37.1);
+        assertEquals(2, score);
+    }
+
+    @Test
+    void oxygenSaturation86ShouldScore1() {
+        int score = calculator.calculateScore(0, 0, 15, 86, 37.1);
+        assertEquals(1, score);
+    }
+
+    @Test
+    void oxygenSaturation87ShouldScore1() {
+        int score = calculator.calculateScore(0, 0, 15, 87, 37.1);
+        assertEquals(1, score);
+    }
+
+    @Test
+    void oxygenSaturation88ShouldScore0() {
+        int score = calculator.calculateScore(0, 0, 15, 88, 37.1);
+        assertEquals(0, score);
+    }
+
+    @Test
+    void oxygenSaturation92ShouldScore0() {
+        int score = calculator.calculateScore(0, 0, 15, 92, 37.1);
+        assertEquals(0, score);
     }
 
     @Test
@@ -68,8 +128,20 @@ public class MediScoreCalculatorTest {
     }
 
     @Test
+    void oxygenSaturation94OnOxygenShouldScore3Total() {
+        int score = calculator.calculateScore(2, 0, 15, 94, 37.1);
+        assertEquals(3, score);
+    }
+
+    @Test
     void oxygenSaturation95OnOxygenShouldScore4Total() {
         int score = calculator.calculateScore(2, 0, 15, 95, 37.1);
+        assertEquals(4, score);
+    }
+
+    @Test
+    void oxygenSaturation96OnOxygenShouldScore4Total() {
+        int score = calculator.calculateScore(2, 0, 15, 96, 37.1);
         assertEquals(4, score);
     }
 
@@ -85,9 +157,28 @@ public class MediScoreCalculatorTest {
         assertEquals(3, score);
     }
 
+
+    @Test
+    void temperature35Point1ShouldScore1() {
+        int score = calculator.calculateScore(0, 0, 15, 95, 35.1);
+        assertEquals(1, score);
+    }
+
+    @Test
+    void temperature36Point0ShouldScore1() {
+        int score = calculator.calculateScore(0, 0, 15, 95, 36.0);
+        assertEquals(1, score);
+    }
+
     @Test
     void temperature36Point1ShouldScore0() {
         int score = calculator.calculateScore(0, 0, 15, 95, 36.1);
+        assertEquals(0, score);
+    }
+
+    @Test
+    void temperature38Point0ShouldScore0() {
+        int score = calculator.calculateScore(0, 0, 15, 95, 38.0);
         assertEquals(0, score);
     }
 
@@ -98,15 +189,21 @@ public class MediScoreCalculatorTest {
     }
 
     @Test
-    void temperature39Point1ShouldScore2() {
-        int score = calculator.calculateScore(0, 0, 15, 95, 39.1);
-        assertEquals(2, score);
+    void temperature39Point0ShouldScore1() {
+        int score = calculator.calculateScore(0, 0, 15, 95, 39.0);
+        assertEquals(1, score);
     }
 
     @Test
-    void nonZeroConsciousnessShouldAdd3() {
-        int score = calculator.calculateScore(0, 1, 15, 95, 37.1);
-        assertEquals(3, score);
+    void temperature35Point05ShouldRoundTo35Point1AndScore1() {
+        int score = calculator.calculateScore(0, 0, 15, 95, 35.05);
+        assertEquals(1, score);
+    }
+
+    @Test
+    void temperature39Point1ShouldScore2() {
+        int score = calculator.calculateScore(0, 0, 15, 95, 39.1);
+        assertEquals(2, score);
     }
 
     @Test
@@ -115,5 +212,16 @@ public class MediScoreCalculatorTest {
         assertEquals(0, score);
     }
 
+    @Test
+    void zeroConsciousnessShouldAdd0() {
+        int score = calculator.calculateScore(0, 0, 15, 95, 37.1);
+        assertEquals(0, score);
+    }
+
+    @Test
+    void nonZeroConsciousnessShouldAdd3() {
+        int score = calculator.calculateScore(0, 1, 15, 95, 37.1);
+        assertEquals(3, score);
+    }
 
 }
