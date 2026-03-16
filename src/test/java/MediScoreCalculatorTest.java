@@ -3,11 +3,11 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-
 public class MediScoreCalculatorTest {
 
     private final MediScoreCalculator calculator = new MediScoreCalculator();
 
+    // Example patients
     @Test
     void examplePatient1ShouldScore0() {
         int score = calculator.calculateScore(0, 0, 15, 95, 37.1);
@@ -26,6 +26,7 @@ public class MediScoreCalculatorTest {
         assertEquals(8, score);
     }
 
+    // Validation
     @Test
     void negativeAirOrOxygenShouldThrowException() {
         assertThrows(IllegalArgumentException.class,
@@ -38,6 +39,43 @@ public class MediScoreCalculatorTest {
                 () -> calculator.calculateScore(1, 0, 15, 95, 37.1));
     }
 
+    @Test
+    void negativeRespirationRateShouldThrowException() {
+        assertThrows(IllegalArgumentException.class,
+                () -> calculator.calculateScore(0, 0, -1, 95, 37.1));
+    }
+
+    @Test
+    void oxygenSaturationAbove100ShouldThrowException() {
+        assertThrows(IllegalArgumentException.class,
+                () -> calculator.calculateScore(0, 0, 15, 101, 37.1));
+    }
+
+    @Test
+    void negativeOxygenSaturationShouldThrowException() {
+        assertThrows(IllegalArgumentException.class,
+                () -> calculator.calculateScore(0, 0, 15, -1, 37.1));
+    }
+
+    @Test
+    void nanTemperatureShouldThrowException() {
+        assertThrows(IllegalArgumentException.class,
+                () -> calculator.calculateScore(0, 0, 15, 95, Double.NaN));
+    }
+
+    @Test
+    void infiniteTemperatureShouldThrowException() {
+        assertThrows(IllegalArgumentException.class,
+                () -> calculator.calculateScore(0, 0, 15, 95, Double.POSITIVE_INFINITY));
+    }
+
+    @Test
+    void negativeInfiniteTemperatureShouldThrowException() {
+        assertThrows(IllegalArgumentException.class,
+                () -> calculator.calculateScore(0, 0, 15, 95, Double.NEGATIVE_INFINITY));
+    }
+
+    // Respiration
     @Test
     void respirationRate0ShouldScore3() {
         int score = calculator.calculateScore(0, 0, 0, 95, 37.1);
@@ -98,10 +136,11 @@ public class MediScoreCalculatorTest {
         assertEquals(3, score);
     }
 
+    // Oxygen Saturation
     @Test
-    void negativeRespirationRateShouldThrowException() {
-        assertThrows(IllegalArgumentException.class,
-                () -> calculator.calculateScore(0, 0, -1, 95, 37.1));
+    void oxygenSaturation0ShouldScore3() {
+        int score = calculator.calculateScore(0, 0, 15, 0, 37.1);
+        assertEquals(3, score);
     }
 
     @Test
@@ -165,6 +204,12 @@ public class MediScoreCalculatorTest {
     }
 
     @Test
+    void oxygenSaturation94OnAirShouldScore0() {
+        int score = calculator.calculateScore(0, 0, 15, 94, 37.1);
+        assertEquals(0, score);
+    }
+
+    @Test
     void oxygenSaturation95OnOxygenShouldScore4Total() {
         int score = calculator.calculateScore(2, 0, 15, 95, 37.1);
         assertEquals(4, score);
@@ -194,18 +239,7 @@ public class MediScoreCalculatorTest {
         assertEquals(0, score);
     }
 
-    @Test
-    void oxygenSaturationAbove100ShouldThrowException() {
-        assertThrows(IllegalArgumentException.class,
-                () -> calculator.calculateScore(0, 0, 15, 101, 37.1));
-    }
-
-    @Test
-    void negativeOxygenSaturationShouldThrowException() {
-        assertThrows(IllegalArgumentException.class,
-                () -> calculator.calculateScore(0, 0, 15, -1, 37.1));
-    }
-
+    // Temperature
     @Test
     void temperature35Point0ShouldScore3() {
         int score = calculator.calculateScore(0, 0, 15, 95, 35.0);
@@ -255,6 +289,30 @@ public class MediScoreCalculatorTest {
     }
 
     @Test
+    void temperature36Point05ShouldRoundTo36Point1AndScore0() {
+        int score = calculator.calculateScore(0, 0, 15, 95, 36.05);
+        assertEquals(0, score);
+    }
+
+    @Test
+    void temperature38Point05ShouldRoundTo38Point1AndScore1() {
+        int score = calculator.calculateScore(0, 0, 15, 95, 38.05);
+        assertEquals(1, score);
+    }
+
+    @Test
+    void temperature39Point04ShouldRoundTo39Point0AndScore1() {
+        int score = calculator.calculateScore(0, 0, 15, 95, 39.04);
+        assertEquals(1, score);
+    }
+
+    @Test
+    void temperature39Point05ShouldRoundTo39Point1AndScore2() {
+        int score = calculator.calculateScore(0, 0, 15, 95, 39.05);
+        assertEquals(2, score);
+    }
+
+    @Test
     void temperature39Point1ShouldScore2() {
         int score = calculator.calculateScore(0, 0, 15, 95, 39.1);
         assertEquals(2, score);
@@ -266,8 +324,9 @@ public class MediScoreCalculatorTest {
         assertEquals(0, score);
     }
 
+    // Consciousness
     @Test
-    void zeroConsciousnessShouldAdd0() {
+    void consciousnessValue0ShouldAdd0() {
         int score = calculator.calculateScore(0, 0, 15, 95, 37.1);
         assertEquals(0, score);
     }
@@ -285,9 +344,28 @@ public class MediScoreCalculatorTest {
     }
 
     @Test
+    void consciousnessValue5ShouldAdd3() {
+        int score = calculator.calculateScore(0, 5, 15, 95, 37.1);
+        assertEquals(3, score);
+    }
+
+    // Oxygen contribution
+    @Test
     void oxygenShouldAdd2EvenWhenSpO2IsInNormalBand() {
         int score = calculator.calculateScore(2, 0, 15, 88, 37.1);
         assertEquals(2, score);
     }
 
+    // Overall score range
+    @Test
+    void minimumPossibleScoreShouldBe0() {
+        int score = calculator.calculateScore(0, 0, 15, 95, 37.1);
+        assertEquals(0, score);
+    }
+
+    @Test
+    void maximumPossibleScoreShouldBe14() {
+        int score = calculator.calculateScore(2, 1, 8, 83, 35.0);
+        assertEquals(14, score);
+    }
 }

@@ -1,16 +1,25 @@
+/**
+ * Calculates a patient's Medi score from physiological observations.
+ */
 public class MediScoreCalculator {
 
     private static final int AIR = 0;
     private static final int OXYGEN = 2;
     private static final int ALERT = 0;
 
+    /**
+     * Returns the total Medi score for the supplied patient observations.
+     */
+    public int calculateScore(
+            int airOrOxygen,
+            int consciousness,
+            int respirationRate,
+            int oxygenSaturation,
+            double temperature
+    ) {
+        validateInputs(airOrOxygen, respirationRate, oxygenSaturation, temperature);
 
-    public int calculateScore(int airOrOxygen, int consciousness, int respirationRate, int oxygenSaturation,
-                              double temperature) {
-
-        validateInputs(airOrOxygen, respirationRate, oxygenSaturation);
-
-        double roundedTemperature = roundToOneDecimalPlace(temperature);
+        double roundedTemperature = roundTemperatureToOneDecimalPlace(temperature);
 
         return scoreAirOrOxygen(airOrOxygen)
                 + scoreConsciousness(consciousness)
@@ -19,9 +28,12 @@ public class MediScoreCalculator {
                 + scoreTemperature(roundedTemperature);
     }
 
-    private void validateInputs(int airOrOxygen, int respirationRate, int oxygenSaturation) {
+    /**
+     * Validates input values before calculating the score.
+     */
+    private void validateInputs(int airOrOxygen, int respirationRate, int oxygenSaturation, double temperature) {
         if (airOrOxygen != AIR && airOrOxygen != OXYGEN) {
-            throw new IllegalArgumentException("airOrOxygen must be AIR (0) or OXYGEN (2)");
+            throw new IllegalArgumentException("airOrOxygen must be 0 (air) or 2 (oxygen)");
         }
         if (respirationRate < 0) {
             throw new IllegalArgumentException("respirationRate must not be negative");
@@ -29,9 +41,12 @@ public class MediScoreCalculator {
         if (oxygenSaturation < 0 || oxygenSaturation > 100) {
             throw new IllegalArgumentException("oxygenSaturation must be between 0 and 100");
         }
+        if (Double.isNaN(temperature) || Double.isInfinite(temperature)) {
+            throw new IllegalArgumentException("temperature must be a valid number");
+        }
     }
 
-    private double roundToOneDecimalPlace(double value) {
+    private double roundTemperatureToOneDecimalPlace(double value) {
         return Math.round(value * 10.0) / 10.0;
     }
 
@@ -59,7 +74,9 @@ public class MediScoreCalculator {
         return 3;
     }
 
-    // For SpO2 above 92, the score depends on whether the patient is on air or oxygen
+    /**
+     * Scores oxygen saturation, taking into account whether the patient is on air or oxygen.
+     */
     private int scoreOxygenSaturation(int airOrOxygen, int oxygenSaturation) {
         if (oxygenSaturation <= 83) {
             return 3;
@@ -100,6 +117,4 @@ public class MediScoreCalculator {
         }
         return 2;
     }
-
-
 }

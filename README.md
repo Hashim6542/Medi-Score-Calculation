@@ -12,12 +12,29 @@ The aim of the task is to calculate a patient's Medi score from a set of physiol
 - oxygen saturation (SpO2)
 - temperature
 
-The calculator returns the final Medi score as an integer.
+The calculator returns the total Medi score as an integer.
 
 ## Project Structure
 
-- `MediScoreCalculator` contains the main scoring logic and input validation
-- `MediScoreCalculatorTest` contains JUnit 5 tests for the example patients, boundaries, rounding, and invalid inputs
+- `src/main/java/MediScoreCalculator.java` contains the main scoring logic and input validation
+- `src/test/java/MediScoreCalculatorTest.java` contains the JUnit 5 test suite
+
+## Prerequisites
+
+- Java 17
+- Maven 3.9+
+
+## How to Run
+
+From the project root, run:
+
+```bash
+mvn test
+```
+
+This compiles the project and runs the JUnit 5 test suite.
+
+The tests can also be run directly from IntelliJ by opening the project and running `MediScoreCalculatorTest`.
 
 ## Task Summary
 
@@ -43,10 +60,11 @@ I also separated input validation and temperature rounding into their own method
 ## Design Decisions
 
 ### Separate helper methods
-I divided each observation category into its own method so that the scoring rules are easier to read, check, and maintain.
+I divided each observation category into its own method so that the scoring rules are easier to read, check, and maintain. This also made it easier to compare each scoring method directly against the specification and to test each category independently.
 
 ### Constants for key values
 I used constants for:
+
 - `AIR = 0`
 - `OXYGEN = 2`
 - `ALERT = 0`
@@ -58,6 +76,7 @@ The specification states that temperature should be rounded to one decimal place
 
 ### Validation
 I added validation for:
+
 - invalid air/oxygen values
 - negative respiration rate
 - oxygen saturation values outside the range `0` to `100`
@@ -70,7 +89,7 @@ Although the brief mainly focuses on the scoring rules, I added input validation
 
 My current implementation assumes that:
 
-- consciousness is interpreted as `0` for alert and any non-zero value as CVPU / confused / unconscious, in line with the brief
+- consciousness is interpreted as `0` for alert and any non-zero value as CVPU, in line with the brief
 - temperature is rounded to one decimal place before scoring
 - clearly invalid numeric input is rejected with an `IllegalArgumentException`
 
@@ -79,6 +98,7 @@ My current implementation assumes that:
 I created a JUnit 5 test suite to verify the implementation.
 
 The test suite covers:
+
 - the 3 example patients from the brief
 - invalid air/oxygen input
 - invalid respiration input
@@ -97,6 +117,15 @@ My focus was to make sure the solution was correct across both normal cases and 
 
 ## Final Notes
 
-My focus for this solution was correctness, readability, and strong boundary-value testing. I aimed to keep the implementation simple while still treating it like a small production-style piece of code.
+My focus for this solution was correctness, readability, and strong boundary-value testing. I aimed to keep the implementation simple and focused on the required scoring function, while still treating it like a small production-style piece of code through clear structure, input validation, and good test coverage.
 
-To do that, I kept the solution focused on the required scoring function rather than adding unnecessary abstractions, while still maintaining clear structure, input validation, and good test coverage.
+I prioritised completing and thoroughly testing the core Medi score calculation before considering the optional extensions.
+
+## Future Improvements
+
+If I were extending this solution further, I would consider:
+
+- implementing the optional bonus tasks from the brief
+- introducing a patient observation object instead of passing all values as separate parameters
+- representing categorical inputs such as air/oxygen and consciousness with enums instead of integers
+- using parameterized tests to reduce repetition in some boundary-value test cases
